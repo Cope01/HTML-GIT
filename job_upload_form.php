@@ -15,7 +15,7 @@
 <body id="job_upload_form">
     <div class="form-container">
         <h1>Job creation</h1>
-        <form method="post" id="job_form" action="details.php" onsubmit="return validateForm();">
+        <form method="post" id="job_form" onsubmit="return validateForm();">
             <div class="form-group">
                 <label for="exampleFormControlInput1">Job name</label>
                 <input type="text" name="Job_name" class="form-control" id="exampleFormControlInput1" pattern="[A-Za-z]+" placeholder="Job name" required>
