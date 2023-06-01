@@ -1,5 +1,14 @@
+<?php
+include "db_config.php";
+
+$sql = "SELECT * FROM cv_upload";
+$result = $conn->query($sql);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +28,16 @@
 </head>
 <body style="background-image: url('images/background.jpg');">
     <div class="container my-5 mx-auto">
+        <?php
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $cv = $row["cv"];
+                $birthdate = $row["birthdate"];
+                $place_of_birth = $row["place_of_birth"];
+                $profession = $row["profession"];
+                $phone_number = $row["number"];
+                $education_level = $row["education_level"];
+        ?>
         <div class="card mb-5">
             <div class="card-header text-white mb-3">
                 Details
@@ -29,68 +48,59 @@
                         <br>
                         <table class="table table-bordered table-hover">
                             <tbody>
-                                <?php
-                                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                                    $cv = $_FILES['cv'];
-                                    $birthdate = $_POST['birthdate'];
-                                    $place_of_birth = $_POST['exampleFormControlInput1'];
-                                    $profession = $_POST['exampleFormControlInput2'];
-                                    $phone_number = $_POST['Offerer_number'];
-                                    $education_level = $_POST['education_level'];
-
-                                    $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '/eeee/uploads/';
-                                    $cv_path = '/eeee/uploads/' . basename($_FILES['cv']['name']);
-                                    $server_cv_path = $uploads_dir . basename($_FILES['cv']['name']);
-                                
-                                    if (!file_exists($uploads_dir)) {
-                                        mkdir($uploads_dir, 0755, true);
-                                    }
-                                
-                                    if (move_uploaded_file($_FILES['cv']['tmp_name'], $server_cv_path)) {
-                                    } else {
-                                        echo "Sorry, there was an error uploading your file.";
-                                    }
-                                }
-                                ?>
-
                                 <tr>
-                                    <th scope="row">Date of birth</th>
+                                    <th scope='row'>Date of birth</th>
                                     <td><?php echo htmlspecialchars($birthdate); ?></td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Place of birth</th>
+                                    <th scope='row'>Place of birth</th>
                                     <td><?php echo htmlspecialchars($place_of_birth); ?></td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Profession</th>
+                                    <th scope='row'>Profession</th>
                                     <td><?php echo htmlspecialchars($profession); ?></td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Phone number</th>
-                                    <td><?php<td><?php echo htmlspecialchars($phone_number); ?></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Education level</th>
-                                <td><?php echo htmlspecialchars($education_level); ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-4">
-                    <div class="row justify-content-end">
-                        <div class="col-6">
-                            <a href="<?php echo htmlspecialchars($cv_path); ?>" download>
-                                <img src="images/placeholder.png" alt="Download CV" style="cursor:pointer;">
-                            </a>
+                                    <th scope='row'>Phone number</th>
+                                    <td><?php echo htmlspecialchars($phone_number); ?></td>
+                                </tr>
+                                <tr>
+                                    <th scope='row'>Education level</th>
+                                    <td><?php echo htmlspecialchars($education_level); ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-4">
+                        <div class="row justify-content-end">
+                            <div class="col-6">
+                                <?php if ($cv) { ?>
+                                    <a href="uploads/<?php echo htmlspecialchars($cv); ?>" download>
+                                        <img src="images/placeholder.png" alt="Download CV" style="cursor:pointer;">
+                                    </a>
+                                <?php } else { ?>
+                                    <img src="images/placeholder.png" alt="No CV uploaded">
+                                <?php } ?>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <a href="user_cv_and_info.php" class="btn btn-outline-dark">Go back</a>
         </div>
+        <?php
+            }
+        } else {
+            echo "<p class='text-white'>0 results</p>";
+        }
+        ?>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-<script src="main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>

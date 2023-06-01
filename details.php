@@ -1,3 +1,25 @@
+<?php
+include 'db_config.php';
+
+// Deleting a record
+if(isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    $delete_sql = "DELETE FROM job_listing WHERE id=?";
+    $stmt = $conn->prepare($delete_sql);
+    $stmt->bind_param("i", $delete_id);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        echo "Record with ID: $delete_id has been deleted.";
+    } else {
+        echo "An error occurred.";
+    }
+}
+
+$sql = "SELECT * FROM job_listing ORDER BY id DESC";
+$result = $conn->query($sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,11 +32,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<body style="background-image: url('images/background.jpg');">
+<body>
+<?php
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $jobName = htmlspecialchars($row['job_name']);
+        $jobOfferer = htmlspecialchars($row['job_offerer']);
+        $offererNumber = htmlspecialchars($row['offerer_number']);
+        $cities = htmlspecialchars($row['cities']);
+        $age = htmlspecialchars($row['age']);
+        $description = htmlspecialchars($row['description']);
+        $createdAt = htmlspecialchars($row['created_at']);
+?>
     <div class="container my-5 mx-auto">
         <div class="card mb-5">
             <div class="card-header text-white mb-3">
-            Job details
+                Job details
             </div>
             <div class="card-body">
                 <div class="row">
@@ -23,98 +56,49 @@
                             <tbody>
                                 <tr>
                                     <th scope="row">Job name</th>
-                                    <td>
-                                        <?php 
-                                        if (isset($_POST["Job_name"])) {
-                                            echo htmlspecialchars($_POST["Job_name"]);
-                                        } else {
-                                            echo "N/A";
-                                        }
-                                        ?>
-                                    </td>
+                                    <td><?php echo $jobName; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Job offerer</th>
-                                    <td>
-                                        <?php 
-                                        if (isset($_POST["job_offerer"])) {
-                                            echo htmlspecialchars($_POST["job_offerer"]);
-                                        } else {
-                                            echo "N/A";
-                                        }
-                                        ?>
-                                    </td>
+                                    <td><?php echo $jobOfferer; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Offerer number</th>
-                                    <td>
-                                        <?php 
-                                        if (isset($_POST["Offerer_number"])) {
-                                            echo htmlspecialchars($_POST["Offerer_number"]);
-                                        } else {
-                                            echo "N/A";
-                                        }
-                                        ?>
-                                    </td>
+                                    <td><?php echo $offererNumber; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">City</th>
-                                    <td>
-                                        <?php 
-                                        if (isset($_POST["city"])) {
-                                            $selected_cities = $_POST["city"];
-                                            $city_names = [
-                                                "maribor" => "Maribor",
-                                                "ljubljana" => "Ljubljana",
-                                                "celje" => "Celje",
-                                                "koper" => "Koper"
-                                            ];
-
-                                            $city = "";
-                                            foreach ($selected_cities as $selected_city) {
-                                                if (isset($city_names[$selected_city])) {
-                                                    $city .= $city_names[$selected_city] . ", ";
-                                                }
-                                            }
-
-                                            echo htmlspecialchars(trim($city));
-                                        } else {
-                                            echo "N/A";
-                                        }
-                                        ?>
-                                    </td>
+                                    <td><?php echo $cities; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Required age</th>
-                                    <td>
-                                        <?php 
-                                        if (isset($_POST["age"])) {
-                                            echo htmlspecialchars($_POST["age"]);
-                                        } else {
-                                            echo "N/A";
-                                        }
-                                        ?>
-                                    </td>
+                                    <td><?php echo $age; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Description</th>
-                                        <td>
-                                            <?php 
-                                            if (isset($_POST["Description"])) {
-                                                echo htmlspecialchars($_POST["Description"]);
-                                            } else {
-                                                echo "N/A";
-                                            }
-                                            ?>
-                                        </td>
-                                    </tr>
+                                    <td><?php echo $description; ?></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Created at</th>
+                                    <td><?php echo $createdAt; ?></td>
+                                </tr>
                             </tbody>
                         </table>
                         <a href="job_upload_form.php" class="btn btn-outline-dark">Go back</a>
+                        <a href="?delete_id=<?php echo $row['id']; ?>" class="btn btn-danger">Delete</a>
+                        <a href="edit_job_form.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">Edit</a>
                     </div>
                 </div>
-                </div>
             </div>
-        </div>                          
+        </div>
+    </div>
+<?php
+    }
+} else {
+    echo "No job details available.";
+}
+
+$conn->close();
+?>
 </body>
 </html>

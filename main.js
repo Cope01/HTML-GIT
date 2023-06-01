@@ -65,18 +65,3 @@ $(document).ready(function() {
     }
   });
 });
-$(document).ready(function() {
-  function setupDatepicker() {
-    $("#birthdate").datepicker({
-      maxDate: "-19y",
-      minDate: "-90y",
-      yearRange: "-90:+0",
-      changeMonth: true,
-      changeYear: true,
-      showOtherMonths: true,
-      selectOtherMonths: true
-    });
-  }
-
-  setupDatepicker();
-});

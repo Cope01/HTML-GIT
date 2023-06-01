@@ -1,3 +1,19 @@
+<?php
+include 'db_config.php';
+if(isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $sql = "SELECT * FROM job_listing WHERE id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $cities = explode(',', $row['cities']);
+} else {
+    header('Location: job_upload_form.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,44 +29,44 @@
 <body id="job_upload_form">
     <div class="form-container">
         <h1>Job creation</h1>
-        <form method="post" id="job_form" action="save_job.php" onsubmit="return validateForm();">
+        <form method="post" id="job_form" action="update_job.php" onsubmit="return validateForm();">
 
             <div class="form-group">
                 <label for="exampleFormControlInput1">Job name</label>
-                <input type="text" name="Job_name" class="form-control" id="exampleFormControlInput1" pattern="[A-Za-z]+" placeholder="Job name" required>
+                <input type="text" name="Job_name" class="form-control" id="exampleFormControlInput1" pattern="[A-Za-z]+" placeholder="Job name" value="<?php echo htmlspecialchars($row['job_name']); ?>" required>
             </div>
             <div class="form-group">
                 <label for="exampleFormControlInput2">Job offerer</label>
-                <input type="text" name="job_offerer" class="form-control" id="exampleFormControlInput2" placeholder="Company name" required>    
+                <input type="text" name="job_offerer" class="form-control" id="exampleFormControlInput2" placeholder="Company name" value="<?php echo htmlspecialchars($row['job_offerer']); ?>" required>    
             </div>
             <div class="form-group">
                 <label for="exampleFormControlInput3">Offerer number</label>
-                <input type="text" name="Offerer_number" class="form-control" id="exampleFormControlInput3" placeholder="123-456-789" pattern="[0-9]{3}-[0-9]{3}-[0-9]{3}" required>
+                <input type="text" name="Offerer_number" class="form-control" id="exampleFormControlInput3" placeholder="123-456-789" pattern="[0-9]{3}-[0-9]{3}-[0-9]{3}" value="<?php echo htmlspecialchars($row['offerer_number']); ?>" required>
             </div>
             <div class="form-group">
                 <label>Select City:</label>
                 <br>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="city[]" value="maribor">
+                        <input type="checkbox" name="city[]" value="maribor" <?php echo in_array("maribor", $cities) ? 'checked' : ''; ?>>
                         Maribor
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="city[]" value="ljubljana">
+                        <input type="checkbox" name="city[]" value="ljubljana" <?php echo in_array("ljubljana", $cities) ? 'checked' : ''; ?>>
                         Ljubljana
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="city[]" value="celje">
+                        <input type="checkbox" name="city[]" value="celje" <?php echo in_array("celje", $cities) ? 'checked' : ''; ?>>
                         Celje
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="city[]" value="koper">
+                        <input type="checkbox" name="city[]" value="koper" <?php echo in_array("koper", $cities) ? 'checked' : ''; ?>>
                         Koper
                     </label>
                 </div>
@@ -62,28 +78,29 @@
                 <br>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="age" value="18-24" required>
+                        <input type="radio" name="age" value="18-24" <?php echo $row['age'] === '18-24' ? 'checked' : ''; ?> required>
                         18-24
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="age" value="25-44" required>
+                        <input type="radio" name="age" value="25-44" <?php echo $row['age'] === '25-44' ? 'checked' : ''; ?> required>
                         25-44
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="age" value="45+" required>
+                        <input type="radio" name="age" value="45+" <?php echo $row['age'] === '45+' ? 'checked' : ''; ?> required>
                         45+
                     </label>
                 </div>
                 <br>
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1">Description</label>
-                    <textarea class="form-control" name="Description" id="exampleFormControlTextarea1" placeholder="Some description of the job" rows="4" required></textarea>
+                    <textarea class="form-control" name="Description" id="exampleFormControlTextarea1" placeholder="Some description of the job" rows="4" required><?php echo htmlspecialchars($row['description']); ?></textarea>
                 </div>
                 <br>
+                <input type="hidden" name="id" value="<?php echo $id; ?>"> <!-- Pass the id of the record being edited -->
                 <button type="submit" class="btn btn-outline-dark">Submit</button>
             </div>
         </form>
